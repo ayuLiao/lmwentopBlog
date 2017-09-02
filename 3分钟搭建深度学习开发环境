@@ -1,0 +1,168 @@
+## 简介
+2017年，深度学习很火，火到我都不好意思不去学，毕竟要跟上时代的部分，当然我觉得我已经不算早的了，因为深度学习太火了，所以网上已经有很多这方面的内容了，我一头扎进去，一脸懵逼是必然的，毕竟都是数学公式，但是总的来说，我还是很兴奋的，因为学点周围人不会的东西又有东西可以吹牛逼了，不会的公式看多几遍，不懂的概念，就去Google。
+
+本篇文章就来简单的讲讲如果搭建深度学习的开发环境。后面我会写抽空将自己学习深度学习的过程和研究的东西都简单的写写
+
+我使用的环境
+Ubuntu 16.04+Docker+TensorFlow
+
+## Docker
+Docker一个非常强大的应用容器引擎，它基于Go语言，至于开源嘛，Docker分为商业版Docker EE和社区版Docker CE，我们一般使用的都是Docker CE，它在Github上进行了开源 [github地址](https://github.com/moby/moby)
+
+如果你点击去看，发现项目名叫moby，没错Docker已经改名为moby，这个是比较少见的，查了一下原因，大致就是想将之前数年里构建出的粉丝团体和Google搜索内容全部转移到Docker公司上，然后推荐大家使用Docker EE（商业版），算是引流吧
+
+简单来讲Docker就是一个虚拟环境，作用类似于VMware，但是实现的技术不同，可以看下面张图，分别是传统虚拟化技术和Docker使用的虚拟化技术
+
+传统虚拟化技术
+![virtualization.png](http://obfs4iize.bkt.clouddn.com/virtualization.png)
+
+Docker
+![docker](http://obfs4iize.bkt.clouddn.com/docker.png)
+
+Docker作为一种新的虚拟化方式，它是比传统的虚拟化技术有很大优势的
+
+1.更高效的利用系统资源
+2.更快速的启动虚拟化环境（几秒就可以启动，传统的需要几分钟）
+3.持续交付和部署
+
+为了进一步理解文章下面的内容，需要提一下Docker中3个基本概念，镜像、容器、仓库
+
+### 镜像
+如果你使用过VMware装过虚拟机，就会知道我们在安装虚拟机时需要载入系统镜像
+![镜像.png](http://obfs4iize.bkt.clouddn.com/%E9%95%9C%E5%83%8F.png)
+
+简单的可以将Docker中的镜像这样理解，都是**静态的资源**
+
+当然Docker镜像还是有与上面提的镜像有很大的差异的，Docker的镜像包含的是操作系统中的root文件系统，而不是整个操作系统，而且Docker在设计时，使用了Union FS技术，设计为一个分层的存储结构，层与层之间相互协作，但是有不会影响，有点像网络中的OSI。
+
+需要注意的是，每层构建完后，就不会再发生改变，后面一层上的任何改变都只发生在自己这一层
+
+### 容器
+容器其实就是一个进程，**镜像与容器的关系就是面向对象程序中类和实例的关系一样**，镜像是静态的，当它被运行起来时，就构成了一个容器，容器可以被创建、启动、停止、删除和暂停，我们所做的操作都会在容器上进行
+
+因为镜像是分层存储的，所以容器也一样，每个容器在运行的时候都是以实例化它的镜像为基础层的，在这个基础层之上创建一个当前容器的存储层，这个为容器运行时读写而准备的存储层叫做容器存储层
+
+有点需要注意，**容器是不会向容器存储层写入任何数据的，也就是说容器存储层是要保持无状态的，容器中所有的文件写入操作都应该使用数据卷或者绑定到宿主的目录（也就是启动该虚拟机的机子的目录上）
+
+>数据卷的生存周期独立于容器，容器消亡，数据卷不会消亡。因此，使用数据卷后，容器可以随意删除、重新 run，数据却不会丢失
+
+### 仓库
+顾名思义，仓库其实就是用于管理镜像的，当我们自己构建完一个镜像后，很容易就可以在自己的电脑上运行起来（也就是生成一个容器），但是我们想让其他人也可以使用到我们构建好的这个镜像呢？
+
+所以就需要一个集中的存储、分发镜像的服务，Docker Registry就是这样的东西
+
+一个Docker Registry中可以有多个仓库（Repository）
+
+简单的说，仓库就是用于管理镜像的，我们可以在一下Registry上的仓库中找到别人为我们准备好的一些镜像，我们直接将这个镜像下载下来就可以直接用了
+
+Docker Hub就是这样的一个地方，由Docker官方维护
+[Docker Hub](https://hub.docker.com/)
+
+这样做的好处非常明显，因为很多开源软件之间的依赖关系并不是非常好搞，所以有些时候我们东西装不上就是缺这个依赖，缺那个依赖，非常蛋疼，而直接从仓库里下别人帮我们准备好的开发环境，所以的依赖已经帮我们解决，这种感觉不要太爽
+
+这也是我们使用Docker来安装TensorFlow的主要原因，太轻松了
+
+## TensorFlow
+这个应该就不用太多介绍了，Google旗下开源的，鼎鼎大名的，深度学习框架，Google亲儿子，而且是非常亲那种，虽然有人说使用TensorFlow这个深度学习框架就像使用C语言编程，使用keras（另一个深度学习框架）就像使用Python，但是如果要搞深度学习，你无法绕开TensorFlow，keras的后端支持也是TensorFlow，可以说keras就是在TensorFlow等多个其他深度学习框架上编写出了的深度学习框架，力求API接口的简单，当然这也造成了控制粒度的问题
+
+TensorFlow在2015年11月9日被开源，从这两年的发展来看，Google对这个亲儿子是非常用心的，像以前对Android那样，Google希望TensorFlow深度学习的框架可以成为业界的一个标准
+
+正是因为TensorFlow如此重要，所以深度学习的第一个框架才选择TensorFlow
+
+## 搭建环境
+
+终于扯到正文
+
+### Docker的安装
+这里我们直接通过最简单的方式来安装Docker，其实Docker的安装还是有点小复杂的，但是Docker官方为简化安装流程，提供了安装脚本，在Ubuntu下可以直接使用这个脚本来安装
+
+```
+curl -sSL https://get.docker.com/ | sh
+```
+
+输入上面的命令，就会下载相应的脚本，脚本将会为我们做好准备工作，帮我们叫Docker直接安装到系统中
+
+因为有墙的原因，所以在国内使用这个脚本，如果没有梯子可能会出现下载出错的情况，为了解决这种情况，国内一些云服务商提供了这个脚本的修改版，修改后的脚本将使用国内的Docker软件源镜像进行安装
+
+
+DaoCloud 的安装脚本
+```
+curl -sSL https://get.daocloud.io/docker | sh
+```
+
+阿里云的安装脚本
+```
+curl -sSL http://acs-public-mirror.oss-cn-hangzhou.aliyuncs.com/docker-engine/internet | sh -
+```
+
+这里我使用的DaoClound的安装脚本
+
+等待安装脚本安装完了，就安装好了Docker了
+
+安装完Docker后，需要将当前用户加入docker这个组中
+
+```
+$ sudo usermod -aG docker ayuliao(你自己的用户名)
+```
+
+原因嘛：
+>默认情况下，docker 命令会使用 Unix socket 与 Docker 引擎通讯。而只有 root 用户和 docker 组的用户才可以访问 Docker 引擎的 Unix socket。出于安全考虑，一般 Linux 系统上不会直接使用 root 用户。因此，更好地做法是将需要使用 docker 的用户加入 docker 用户组。
+
+### TensorFlow的安装
+既然我们已经安装好了Docker，要安装TensorFlow就要思考一下，Docker有没有为我们提供一个安装好TensorFlow的镜像呢？
+
+非常感动，Google提供了TensorFlow的Docker镜像，这里我通过在docker Hub来找TensorFlow，一搜就出来了，有那么多个，当然是选择第一个，星最多的那个一般比较靠谱
+
+![TensorFlow搜索.png](http://obfs4iize.bkt.clouddn.com/TensorFlow%E6%90%9C%E7%B4%A2.png)
+
+点击进入后，直接安装页面中提示的命令
+
+```
+$ sudo docker run -it -p 8888:8888 tensorflow/tensorflow
+```
+
+这个命令会启动tensorflow镜像，也就是生成一个容器，它首先会检查本地是否存在这个镜像，如果有就直接启动，如果没有就会去下载，正常启动如图
+
+![运行Docker.png](http://obfs4iize.bkt.clouddn.com/%E8%BF%90%E8%A1%8CDocker.png)
+
+![Tensorflow镜像运行.png](http://obfs4iize.bkt.clouddn.com/Tensorflow%E9%95%9C%E5%83%8F%E8%BF%90%E8%A1%8C.png)
+
+将之前命令提示的url中的token中内容复制下来，然后作为这个界面的token输入，就可以登录，比如我这里的url是 http://localhost:8888/?token=5956e1d5cb4c3ac845a2cc904cb08d9b67ba51b67c095385
+
+所以token是5956e1d5cb4c3ac845a2cc904cb08d9b67ba51b67c095385
+
+登录进入后，就可以看大是一个jupyter notebook，里面为我们提供了一些使用TensorFlow的基础代码，非常基础
+
+![TensorFlow运行2.png](http://obfs4iize.bkt.clouddn.com/TensorFlow%E8%BF%90%E8%A1%8C2.png)
+
+
+我们可以通过ctrl+c停止
+
+我们可以通过下面的命令，进入容器的命令行，通过命令行来造成这个容器
+
+```
+$ sudo docker run -it tensorflow/tensorflow /bin/bash
+```
+
+!(进入虚拟环境命令行.png)[http://obfs4iize.bkt.clouddn.com/%E8%BF%9B%E5%85%A5%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83%E5%91%BD%E4%BB%A4%E8%A1%8C.png]
+
+这里我通过lsb_release -a命令查看了当前虚拟环境的系统
+
+注意跟在 root@ 后面的 dd358cfe26e7 就是新创建出的这个容器的id，每次创建，这个id都不相同，这也就意味着，**容器中的操作，不会被保存下来**
+
+这里先不讨论这个问题
+
+接着我们可以简单写一段代码，来证明TensorFlow环境是没问题的，代码很简单，就是定义两个向量，然后将他们加起来，这里要输出相加的结果，不能直接使用print result，必须先要生成一个会话（session），然后通过这个会话来计算结果，正常输出，说明TensorFlow安装没毛病
+
+![测试TensorFlow正常.png](http://obfs4iize.bkt.clouddn.com/%E6%B5%8B%E8%AF%95TensorFlow%E6%AD%A3%E5%B8%B8.png)
+
+## 结尾
+
+其实安装TensorFlow还可以通过源码编译的形式、pip安装、virtualenv创建python虚拟环境的形式安装，但是还是觉得Docker最方便，当然还有个原因，可以借此来了解Docker，毕竟这也是虚拟化技术未来的发展方向
+
+用代码编写乐趣---ayuliao
+
+
+
+
+
