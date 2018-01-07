@@ -186,6 +186,27 @@ env  test.py
 
 ![](http://obfs4iize.bkt.clouddn.com/cloud9%E8%BF%90%E8%A1%8C%E6%88%90%E5%8A%9F.png)
 
+但是这样只是安装了，想要运行相应编程语言，需要安装对应的环境，比如要运行python，就要安装python的环境，那么这种比较麻烦的工作也有人帮我们写好了对应的脚本，我们只需要将脚本下载下来运行一下，就可以安装好所有的环境了
+
+```
+git clone https://github.com/izuolan/env.git
+
+cd env
+//给予脚本运行权限
+chomd +x run.sh
+./run.sh
+```
+
+运行效果如下：
+
+![web.png](http://onxxjmg4z.bkt.clouddn.com/web.png)
+
+第一次运行你要安装基础软件包，所有选择0
+
+然后你就可以安装python环境了，选择3
+
+这样配置好一个在线的python开发环境了
+
 ## 结尾
 随着对在线编辑的了解，发现越来越多的Web IDE，同时也再次体会到了Docker的强大之处，然配置环境的痛苦见鬼去吧，这里推荐一篇，通过Docker搭建在线Android开发环境，怎么说我以前也是搞Android的，哈哈
 
