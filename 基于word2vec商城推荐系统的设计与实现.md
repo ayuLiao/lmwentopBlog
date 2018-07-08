@@ -307,12 +307,12 @@ UserCF和ItemCF依赖共现矩阵间简单的相似性度量来匹配相似的�
 ### 4.2 处理用户浏览商品的数据
 用户浏览商城中商品的轨迹数据是隐式的，无法通过爬虫抓取，而亚马逊开源了从1996年5月到2014年7月的用户浏览数据，当然除了用户浏览数据外还有用户评论数据、产品信息数据等，直接下载亚马逊按产品类型分类好的数据到本地。
 
-![](media/15130016026898/15189617903249.jpg)
+![](http://p6un02lk4.bkt.clouddn.com/15189617903249.jpg)
 
 我将数据分别放到了2个不同的文件夹中，为了测试编写的代码是否可以正常运行，所以放置了一小部分数据到data文件夹中。
 
 当然，亚马逊本身还提供了没有按产品类型分类的完整数据供我们下载，同样将其下载到本地，并解压，metadata.json大小为10.54GB。
-![](media/15130016026898/15189621154381.jpg)
+![](http://p6un02lk4.bkt.clouddn.com/15189621154381.jpg)
 
 读取metadata.json中的数据，数据的格式如下：
 
@@ -349,7 +349,7 @@ UserCF和ItemCF依赖共现矩阵间简单的相似性度量来匹配相似的�
 因为要通过Django搭建一个web系统，需要显示产品的一些信息，如产品的图片、产品的ID、产品的标题等，所以需要将数据存到数据库中，方便Django从数据库中获取数据并显示在web界面中。
 
 首先创建一个Django项目，名为wmrs(Word2vec Mysql Recommended system)，项目结构如下
-![](media/15130016026898/15189637726161.jpg)
+![](http://p6un02lk4.bkt.clouddn.com/15189637726161.jpg)
 
 data、data2用于存放亚马逊提供的数据，product是Django应用，static用于存放资源文件，templates存放静态文件，utils用于存放我们编写的一些工具代码，wmrs存放Django项目的配置文件和路径文件等。
 
@@ -387,7 +387,7 @@ db.close()
 
 因为要读入的数据比较大，所以使用python的生成器来读取。上面代码将metadata.json.gz中的asin、imUrl、price、title读入到wmrsdb数据库中，通过navicat来显示数据。
 
-![](media/15130016026898/15189641843114.jpg)
+![](http://p6un02lk4.bkt.clouddn.com/15189641843114.jpg)
 
 
 ### 4.3 word2vec训练数据生成推荐模型
@@ -457,7 +457,7 @@ if __name__ == '__main__':
 + hs - 如果等于1，层次的softmax将用于模型训练。如果设置为0（默认），并且'negative'不为零，则将使用负采样。
 
 训练的结果如下：
-![](media/15130016026898/15189656396206.jpg)
+![](http://p6un02lk4.bkt.clouddn.com/15189656396206.jpg)
 
 可以自行验证一下这些模型有无效果
 
@@ -467,7 +467,7 @@ if __name__ == '__main__':
 metadata.json.gz的数据已经存到MySQL数据库中，Word2vec也训练完了数据并生成的推荐模型，接着就来完善web系统，通过Django搭建web系统比较简单
 
 该web系统对应只有3个界面
-![](media/15130016026898/15189674944504.jpg)
+![](http://p6un02lk4.bkt.clouddn.com/15189674944504.jpg)
 
 + error.html - 没有找到推荐商品显示的界面
 + index.html - 主页，随机显示数据库中的商品数据
@@ -570,4 +570,15 @@ class Word2vecListView(View):
 [1][期刊论文] 张锋, 常会友, Zhang Feng, Chang Huiyou - 《计算机研究与发展》 2006年4期
 [2]R. He, J. McAuley. Modeling the visual evolution of fashion trends with one-class collaborative filtering. WWW, 2016
 [3]J. McAuley, C. Targett, J. Shi, A. van den Hengel. Image-based recommendations on styles and substitutes. SIGIR, 2015
+
+
+
+
+
+
+
+
+
+
+
 
